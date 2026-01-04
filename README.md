@@ -1,4 +1,4 @@
-# jepsen-k8s-setup (MVP)
+# jepsen-k8s-setup
 
 A simple **host setup + kind + MetalLB** harness to prepare a Kubernetes environment suitable for running Jepsen-style tests.
 For example, [ScalarDB Cluster tests](https://github.com/scalar-labs/scalar-jepsen).

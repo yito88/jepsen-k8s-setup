@@ -26,10 +26,16 @@ detect_metallb_pool() {
     return 0
   fi
 
-  local net subnet ip a b
+  local net subnets subnet ip a b
   net="$(kind_network_name)"
-  subnet="$(docker network inspect "${net}" -f '{{(index .IPAM.Config 0).Subnet}}' 2>/dev/null || true)"
-  [[ -n "${subnet}" ]] || die "Could not detect docker network subnet for '${net}'. Set METALLB_POOL_CIDR manually."
+
+  subnets="$(docker network inspect "${net}" -f '{{range .IPAM.Config}}{{println .Subnet}}{{end}}' 2>/dev/null || true)"
+  [[ -n "${subnets}" ]] || die "Could not detect docker network subnets for '${net}'. Set METALLB_POOL_CIDR manually."
+
+  subnet="$(echo "${subnets}" | grep -E '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/' | head -n1 || true)"
+  if [[ -z "${subnet}" ]]; then
+    die "No IPv4 subnet found for docker network '${net}'. Detected: ${subnets}. Set METALLB_POOL_CIDR manually, or create kind cluster with IPv4."
+  fi
 
   ip="${subnet%/*}"
   IFS='.' read -r a b _ _ <<<"${ip}"
