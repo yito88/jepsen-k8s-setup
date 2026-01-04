@@ -149,6 +149,8 @@ EOF
   done
   [[ -n "${ip}" ]] || die "Timed out waiting for LoadBalancer IP. Check logs: kubectl -n ${METALLB_NS} logs -l app=metallb --all-containers"
 
+  sleep 5  # wait a bit for nginx to be ready
+
   echo "[+] Curling nginx via ${ip}"
   curl -fsS "http://${ip}" >/dev/null || die "Smoke test failed: curl http://${ip} did not succeed."
   echo "[+] Smoke test passed."
