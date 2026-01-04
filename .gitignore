@@ -1,0 +1,12 @@
+.DS_Store
+*.swp
+
+.env
+.env.*
+*.key
+*.pem
+id_rsa
+id_ed25519
+
+kubeconfig
+.kind/
