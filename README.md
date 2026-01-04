@@ -25,6 +25,23 @@ cd jepsen-k8s-setup
 ./scripts/cluster.sh down
 ```
 
+### Run Jepsen test
+Example: ScalarDB Cluster test
+```bash
+git clone https://github.com/scalar-labs/scalar-jepsen.git
+cd scalar-jepsen/scalardb
+
+lein with-profile cluster run test \
+  --db postgres \
+  --workload transfer \
+  --nodes localhost \
+  --time-limit 60 \
+  --concurrency 5 \
+  --ssh-private-key ~/.ssh/id_ed25519
+
+# Need to specify the SSH key with --ssh-private-key for the key created by host-setup.sh
+```
+
 ## What this does
 
 - Installs: Docker Engine, kubectl, Helm, kind, Java, Leiningen
