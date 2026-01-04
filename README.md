@@ -27,6 +27,7 @@ cd jepsen-k8s-setup
 
 ### Run Jepsen test
 Example: ScalarDB Cluster test
+    - ScalarDB Cluster requires a license key (trial license or commercial license)
 ```bash
 git clone https://github.com/scalar-labs/scalar-jepsen.git
 cd scalar-jepsen/scalardb
