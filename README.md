@@ -28,6 +28,8 @@ cd jepsen-k8s-setup
 ## What this does
 
 - Installs: Docker Engine, kubectl, Helm, kind, Java, Leiningen
+- Sets up passwordless `ssh localhost` access for the current user, which is required by Jepsen
+    - `host-setup.sh --no-ssh-localhost`: Skip setting up passwordless `ssh localhost`
 - Creates a kind cluster (name: `jepsen`)
 - Installs MetalLB (native manifests)
 - Auto-detects a safe IP pool from the kind Docker network and configures MetalLB

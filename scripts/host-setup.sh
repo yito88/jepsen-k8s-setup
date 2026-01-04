@@ -1,6 +1,28 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# default: enabled
+JEPSEN_SETUP_SSH_LOCALHOST=1
+
+# parse args
+for arg in "$@"; do
+  case "$arg" in
+    --no-ssh-localhost)
+      JEPSEN_SETUP_SSH_LOCALHOST=0
+      ;;
+    --help|-h)
+      echo "Usage: $0 [--no-ssh-localhost]"
+      exit 0
+      ;;
+    *)
+      echo "Unknown option: $arg" >&2
+      exit 2
+      ;;
+  esac
+done
+
+export JEPSEN_SETUP_SSH_LOCALHOST
+
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # shellcheck disable=SC1091
 source "${ROOT_DIR}/versions.env"
@@ -108,12 +130,45 @@ install_java_lein() {
   lein version >/dev/null
 }
 
+setup_ssh_localhost() {
+  if [[ "${JEPSEN_SETUP_SSH_LOCALHOST:-1}" != "1" ]]; then
+    echo "[=] Skipping ssh localhost setup (JEPSEN_SETUP_SSH_LOCALHOST!=1)"
+    return 0
+  fi
+
+  echo "[+] Ensuring ssh localhost works without prompts"
+
+  ${SUDO} apt-get install -y --no-install-recommends openssh-client openssh-server
+  ${SUDO} systemctl enable --now ssh || ${SUDO} systemctl enable --now sshd || true
+
+  mkdir -p ~/.ssh
+  chmod 700 ~/.ssh
+
+  if [[ ! -f ~/.ssh/id_ed25519 ]]; then
+    ssh-keygen -t ed25519 -N "" -f ~/.ssh/id_ed25519
+  fi
+
+  touch ~/.ssh/authorized_keys
+  chmod 600 ~/.ssh/authorized_keys
+  grep -qxF "$(cat ~/.ssh/id_ed25519.pub)" ~/.ssh/authorized_keys || cat ~/.ssh/id_ed25519.pub >> ~/.ssh/authorized_keys
+
+  # Only localhost entries to avoid "trust-on-first-use" prompts
+  touch ~/.ssh/known_hosts
+  chmod 600 ~/.ssh/known_hosts
+  ssh-keyscan -H localhost 127.0.0.1 ::1 2>/dev/null >> ~/.ssh/known_hosts || true
+
+  # Non-interactive validation
+  ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new localhost true
+  echo "[+] ssh localhost OK"
+}
+
 echo "[*] Starting host setup"
 install_docker
 install_kubectl
 install_helm
 install_kind
 install_java_lein
+setup_ssh_localhost
 
 echo "[+] Done."
 echo "    - Docker: $(docker --version 2>/dev/null || true)"
