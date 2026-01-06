@@ -44,7 +44,7 @@ echo "[+] Updating apt indexes"
 ${SUDO} apt-get update -y
 
 echo "[+] Installing base dependencies"
-${SUDO} apt-get install -y --no-install-recommends   ca-certificates curl gnupg lsb-release   git jq unzip socat conntrack iptables   apt-transport-https
+${SUDO} apt-get install -y --no-install-recommends ca-certificates curl gnupg lsb-release git jq unzip socat conntrack iptables apt-transport-https graphviz
 
 install_docker() {
   if require_cmd docker; then
