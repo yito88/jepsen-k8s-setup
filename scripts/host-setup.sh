@@ -2,16 +2,16 @@
 set -euo pipefail
 
 # default: enabled
-JEPSEN_SETUP_SSH_LOCALHOST=1
+JEPSEN_SETUP_SSH_LOCALHOST=0
 
 # parse args
 for arg in "$@"; do
   case "$arg" in
-    --no-ssh-localhost)
-      JEPSEN_SETUP_SSH_LOCALHOST=0
+    --ssh-localhost)
+      JEPSEN_SETUP_SSH_LOCALHOST=1
       ;;
     --help|-h)
-      echo "Usage: $0 [--no-ssh-localhost]"
+      echo "Usage: $0 [--ssh-localhost]"
       exit 0
       ;;
     *)

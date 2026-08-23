@@ -34,11 +34,7 @@ cd scalar-jepsen/scalardb
 
 lein with-profile cluster run test \
   --db postgres \
-  --workload transfer \
-  --nodes localhost \
-  --time-limit 60 \
-  --concurrency 5 \
-  --ssh-private-key ~/.ssh/id_ed25519
+  --workload transfer
 
 # Need to specify the SSH key with --ssh-private-key for the key created by host-setup.sh
 ```
@@ -46,8 +42,9 @@ lein with-profile cluster run test \
 ## What this does
 
 - Installs: Docker Engine, kubectl, Helm, kind, Java, Leiningen
-- Sets up passwordless `ssh localhost` access for the current user, which is required by Jepsen
-    - `host-setup.sh --no-ssh-localhost`: Skip setting up passwordless `ssh localhost`
+- ~~Sets up passwordless `ssh localhost` access for the current user, which is required by Jepsen~~
+    - We don't need passwordless ssh login if you run a Jepsen test with [`jepsen-k8s`](https://github.com/scalar-labs/jepsen-k8s)
+    - `host-setup.sh --ssh-localhost`: Set up passwordless `ssh localhost`
 - Creates a kind cluster (name: `jepsen`)
 - Installs MetalLB (native manifests)
 - Auto-detects a safe IP pool from the kind Docker network and configures MetalLB
